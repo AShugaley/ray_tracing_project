@@ -26,7 +26,7 @@ public class Main {
 //            double y = Integer.parseInt(args[5]);
 //        }
 //
-//        Scene s = Parser.parseFile(args[1]);
+//        Scene s = Parser.parseFile(args[1]); //need to change parser for this to work - see there
 //        //s.doStuff;
     }
 
