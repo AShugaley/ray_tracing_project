@@ -13,7 +13,7 @@ public class Parser {
     public static Scene parseFile(String file){
         Scene result = new Scene();
         URL url = result.getClass().getResource(file);
-        File f = new File(url.getPath());
+        File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
 
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
