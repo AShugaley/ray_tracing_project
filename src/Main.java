@@ -32,6 +32,7 @@ public class Main {
 
 
     public static void runTests(){
-        Tests.vectorTests();
+        //Tests.vectorTests();
+        Tests.parserTests();
     }
 }

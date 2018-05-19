@@ -17,6 +17,10 @@ public class Vector {
         this.members = new double[]{x,y,z};
     }
 
+    public Vector(String x, String y, String z){
+        this.members = new double[]{Float.parseFloat(x) ,Float.parseFloat(y) ,Float.parseFloat(z)};
+    }
+
     public void add(Vector other){ //changes in place
         for(int i = 0; i<3;i++)
             this.members[i] += other.members[i];

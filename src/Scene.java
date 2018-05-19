@@ -14,6 +14,14 @@ public class Scene {
     public ArrayList<Material> materials;
 
 
+    public  Scene(){
+        lights = new ArrayList<Light>();
+        surfaces = new ArrayList<Surface>();
+        materials = new ArrayList<Material>();
+
+    }
+
+
 
 
 
