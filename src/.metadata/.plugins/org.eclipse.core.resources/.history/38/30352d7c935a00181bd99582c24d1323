@@ -1,0 +1,6 @@
+public class Sphere extends Surface {
+    public Vector position;
+    public float radius;
+    public float center;
+    
+}

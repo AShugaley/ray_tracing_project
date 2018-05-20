@@ -1,0 +1,4 @@
+public class InfinitePlane extends Surface {
+	Vector normal;
+	float normal_offset;
+}

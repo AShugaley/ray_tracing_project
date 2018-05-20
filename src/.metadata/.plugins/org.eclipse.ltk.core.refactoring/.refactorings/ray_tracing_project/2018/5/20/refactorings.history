@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;Plane&apos; to &apos;InfinitePlane&apos;&#x0D;&#x0A;- Original project: &apos;ray_tracing_project&apos;&#x0D;&#x0A;- Original element: &apos;Plane&apos;&#x0D;&#x0A;- Renamed element: &apos;InfinitePlane&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;Plane&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;{Plane.java[Plane" matchStrategy="1" name="InfinitePlane" qualified="false" references="true" similarDeclarations="false" stamp="1526645220095" textual="false" version="1.0"/>
+</session>

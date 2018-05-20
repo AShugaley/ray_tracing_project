@@ -1,0 +1,19 @@
+public class RayTracer {
+	Scene scene;
+	float[][] image;
+	
+	public RayTracer()
+	{
+		image = new float[500][500];
+	}
+	
+	public RayTracer(int width)
+	{
+		image = new float[width][width];
+	}
+	
+	public void shootRays()
+	{
+		for(int i=0; i<)
+	}
+}

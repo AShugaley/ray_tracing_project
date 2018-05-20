@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;refff&apos; to &apos;RenderScene&apos;" description="Rename resource &apos;refff&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/refff" name="RenderScene" stamp="1526821462074" updateReferences="true"/>
+</session>

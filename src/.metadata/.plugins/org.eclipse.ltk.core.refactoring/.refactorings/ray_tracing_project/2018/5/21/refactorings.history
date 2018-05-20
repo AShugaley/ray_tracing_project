@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;Ray.java&apos; to &apos;Vector.java&apos;&#x0D;&#x0A;- Original project: &apos;ray_tracing_project&apos;&#x0D;&#x0A;- Destination element: &apos;Vector.java&apos;&#x0D;&#x0A;- Original element: &apos;ray_tracing_project.Ray.java&apos;&#x0D;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="/src&lt;{Vector.java" element1="/src&lt;ray_tracing_project{Ray.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1526817581636" units="1" version="1.0"/>
+</session>

@@ -1,0 +1,29 @@
+public class RayTracer {
+	Scene scene;
+	float[][] image;
+	
+	public RayTracer()
+	{
+		image = new float[500][500];
+	}
+	
+	public RayTracer(int width)
+	{
+		image = new float[width][width];
+	}
+	
+	public void shootRays()
+	{
+		for(int i=0; i<image.length; i++)
+		{
+			for(int j=0; j<image[0].length; j++)
+			{
+				
+				float z = scene.camera.screen_distance;
+				float x = ;
+				float y = ;
+				Vector ray = new Vector(x,y,z);
+			}
+		}
+	}
+}

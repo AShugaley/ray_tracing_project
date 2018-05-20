@@ -1,0 +1,6 @@
+import ray_tracing_project.Scene;
+
+public class RayTracer {
+	Scene scene;
+	
+}
