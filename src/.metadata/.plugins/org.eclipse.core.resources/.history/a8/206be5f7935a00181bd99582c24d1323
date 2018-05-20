@@ -1,4 +1,0 @@
-public class Plane extends Surface {
-	Vector normal;
-	float normal_offset;
-}

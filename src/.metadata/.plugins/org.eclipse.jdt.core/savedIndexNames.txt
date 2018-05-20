@@ -1,5 +1,0 @@
-INDEX VERSION 1.129+C:\Users\mor\Documents\GitHub\ray_tracing_project\src\.metadata\.plugins\org.eclipse.jdt.core
-3561387535.index
-1269926071.index
-2249057860.index
-2808838718.index
