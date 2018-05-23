@@ -1,7 +1,7 @@
-public class Sphere extends Surface {
-    Vector position;
-    float radius;
-
+public class InfinitePlane extends Surface {
+    public Vector normal;
+    public Float offset;
+    
     
     /*
      * The function calculate a ray-surface intersect, according to the surface type.
@@ -20,6 +20,5 @@ public class Sphere extends Surface {
     	
     	
     }
-    
 
 }

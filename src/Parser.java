@@ -114,7 +114,7 @@ public class Parser {
 
     }
     public static void addPlane(Scene s, String[] line){
-        Plane p = new Plane();
+        InfinitePlane p = new InfinitePlane();
 
         p.normal = new Vector(line[1],line[2],line[3]);
         p.offset = Float.parseFloat(line[4]);
