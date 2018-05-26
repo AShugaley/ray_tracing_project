@@ -55,14 +55,16 @@ public class Parser {
 
 
     public static void addCamera(Scene s, String[] line){
-        Camera c = new Camera();
 
-        c.position = new Vector(line[1],line[2],line[3]);
-        c.look_at_point = new Vector(line[4],line[5],line[6]);
-        c.up_vector = new Vector(line[7],line[8],line[9]);
-        c.screen_distance = Float.parseFloat(line[10]);
-        c.screen_width = Float.parseFloat(line[11]);
+        Vector position = new Vector(line[1],line[2],line[3]);
+        Vector look_at_point = new Vector(line[4],line[5],line[6]);
+        Vector up_vector = new Vector(line[7],line[8],line[9]);
+        float screen_distance = Float.parseFloat(line[10]);
+        float screen_width = Float.parseFloat(line[11]);
 
+        Camera c = new Camera(position, look_at_point, up_vector, screen_distance, screen_width);
+
+        
         s.camera = c;
     }
 
@@ -70,9 +72,9 @@ public class Parser {
     public static void addMaterial(Scene s, String[] line){
         Material m = new Material();
 
-        m.diffuse_color = new Vector(line[1],line[2],line[3]);
-        m.spectular_color = new Vector(line[4],line[5],line[6]);
-        m.reflection_color = new Vector(line[7],line[8],line[9]);
+        m.diffuse_color = new Color(line[1],line[2],line[3]);
+        m.specular_color = new Color(line[4],line[5],line[6]);
+        m.reflection_color = new Color(line[7],line[8],line[9]);
         m.phong_specularity_coefficient = Float.parseFloat(line[10]);
         m.transparency = Float.parseFloat(line[11]);
 
@@ -84,7 +86,7 @@ public class Parser {
         Light l = new Light();
 
         l.position = new Vector(line[1],line[2],line[3]);
-        l.color = new Vector(line[4],line[5],line[6]);
+        l.color = new Color(line[4],line[5],line[6]);
         l.specular_intencity = Float.parseFloat(line[7]);
         l.shadow_intencity = Float.parseFloat(line[8]);
         l.radius = Float.parseFloat(line[9]);
@@ -95,7 +97,7 @@ public class Parser {
 
 
     public static void addSettings(Scene s, String[] line){
-        s.background_color = new Vector(line[1],line[2],line[3]);
+        s.background_color = new Color(line[1],line[2],line[3]);
         s.number_shadow_rays = Integer.parseInt(line[4]);
         s.max_recursion_level = Integer.parseInt(line[5]);
         s.super_sampling_level = Integer.parseInt(line[6]);
@@ -105,7 +107,7 @@ public class Parser {
     public static void addSphere(Scene s, String[] line){
         Sphere sc = new Sphere();
 
-        sc.position =  new Vector(line[1],line[2],line[3]);
+        sc.center_position =  new Vector(line[1],line[2],line[3]);
         sc.radius = Float.parseFloat(line[4]);
         sc.material = Integer.parseInt(line[5]);
 

@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Scene {
 
-    public Vector background_color;
+    public Color background_color;
     public int number_shadow_rays;
     public int max_recursion_level;
     public int super_sampling_level;

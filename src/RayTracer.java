@@ -28,8 +28,6 @@ public class RayTracer {
 	public RayTracer()
 	{
 		image = new float[imageWidth][imageHeight];
-		//rays array - for one pixel
-		rays = new Ray[scene.super_sampling_level*scene.super_sampling_level];
 	}
  
     /**
@@ -185,15 +183,8 @@ public class RayTracer {
  
         
         // Put your ray tracing code here!
-        //
-        // Write pixel color values in RGB format to rgbData:
-        // Pixel [x, y] red component is in rgbData[(y * this.imageWidth + x) * 3]
-        //            green component is in rgbData[(y * this.imageWidth + x) * 3 + 1]
-        //             blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
-        //
-        // Each of the red, green and blue components should be a byte, i.e. 0-255
-
         pixels = new Pixel[imageHeight][imageWidth];
+        scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
         
 		//TODO - if there are no surfaces - create background and exit
 		
@@ -204,41 +195,22 @@ public class RayTracer {
 				pixels[i][j] = new Pixel(scene.super_sampling_level, i, j);
 				
 				//For each pixel fill the rays array 
-				pixels[i][j].setRaysFromPixel(scene.camera);
+				pixels[i][j].setRaysFromPixel(scene.camera, scene.super_sampling_level);
 				
 				//For each ray - check which surface intersects with it on the closest position 
 				for(int k=0; k<pixels[i][j].rays.length; k++)
 				{
-					float dist; 
-					for(Surface surface: scene.surfaces)
-					{
-						dist = surface.intersectDist(pixels[i][j].rays[k]);
-						if(dist < pixels[i][j].rays[k].min_distance_intersect)
-						{
-							pixels[i][j].rays[k].min_distance_intersect = dist;
-							pixels[i][j].rays[k].closest_intersect = surface;
-						}
-					}
-								
-					pixels[i][j].rays[k].updateRayLength(dist);
-					pixels[i][j].calculateInPixelColor(k,1);
+					pixels[i][j].rays[k].checkRayIntersection(scene);
+					
+					//pixels[i][j].rays[k].updateRayLength(dist);
+					pixels[i][j].updateInPixelColor(pixels[i][j].rays[k],1, scene, k);
 				}
 				
-				rgbData = pixels[i][j].calculatePixelColor(rgbData); //The color from all the rays is allready update
-				
-				
-				//num of rays to shoot
-		/*		for(int r = 0; r< Math.pow(scene.camera.screen_distance, scene.camera.screen_distance); r++)
-				{
-					float z = scene.camera.screen_distance;
-					float x = ;
-					float y = ;
-					Vector ray = new Vector(x,y,z);
-				}*/
+				//The color from all the rays is already update
+				pixels[i][j].calculatePixelColor(rgbData, imageWidth); 	
 			}
 		}
                
- 
         long endTime = System.currentTimeMillis();
         Long renderTime = endTime - startTime;
  
