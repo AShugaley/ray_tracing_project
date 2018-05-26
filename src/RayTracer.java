@@ -176,10 +176,10 @@ public class RayTracer {
                 {
                     Triangle t = new Triangle();
 
-                    t.v1 = new Vector(line[1],line[2],line[3]);
-                    t.v2 = new Vector(line[4],line[5],line[6]);
-                    t.v3 = new Vector(line[7],line[8],line[9]);
-                    t.material = Integer.parseInt(line[10]);
+                    t.v1 = new Vector(params[1],params[2],params[3]);
+                    t.v2 = new Vector(params[4],params[5],params[6]);
+                    t.v3 = new Vector(params[7],params[8],params[9]);
+                    t.material = Integer.parseInt(params[10]);
 
                     scene.surfaces.add(t);
 
