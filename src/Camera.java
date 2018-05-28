@@ -20,7 +20,7 @@ public class Camera {
     	//that the camera looks at.
     	Vector lookAt_up_normal = look_at_direction.cross_product(up_vector);
 		up_vector = look_at_direction.cross_product(lookAt_up_normal);
-		up_vector.multiply_scalar(-1);  
+		up_vector = up_vector.multiply_scalar(-1);
 		up_vector.normalize();
     }
    
