@@ -8,7 +8,7 @@ public class Tests {
         Vector u = new Vector(1,2,3);
 
 
-        v.multiply(5);
+        v.multiply_scalar(5);
         System.out.println(Arrays.toString(v.members));
 
 

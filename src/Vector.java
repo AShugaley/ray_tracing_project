@@ -70,7 +70,7 @@ public class Vector {
     	return (float)Math.sqrt(x*x + y*y + z*z);
     }
 
-    public void toUnitVector()
+    public void normalize()
 	{
 		this.multiply_scalar(1/this.calcLength());
 	}

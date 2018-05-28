@@ -36,7 +36,7 @@ public class RayTracer {
     public static void main(String[] args) {
  
     	/////////DELETE////////
-    	runTests();
+    	//runTests();
     	
         try {
  
@@ -59,8 +59,12 @@ public class RayTracer {
             }
  
             // Parse scene file:
-            tracer.parseScene(sceneFileName);
- 
+            //TODO - light that line when parser will be update 
+           // tracer.parseScene(sceneFileName);
+            
+            //delete that after parser update 
+            tracer.scene = Parser.parseFile(sceneFileName);
+         
             // Render scene:
             tracer.renderScene(outputFileName);
  
@@ -71,9 +75,6 @@ public class RayTracer {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
- 
-        	
- 
     }
  
     ///////DELETE//////

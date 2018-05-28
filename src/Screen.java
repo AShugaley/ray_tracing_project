@@ -33,7 +33,7 @@ public class Screen {
 		Vector screenCenter = cam.position.add(cam.look_at_direction.multiply_scalar(screen_distance));
 		
 		Vector right = cam.up_vector.cross_product(cam.look_at_direction);
-		right.toUnitVector();
+		right.normalize();
 		
 		//Go to the top
 		topLeft_screen_corner = screenCenter.add(cam.up_vector.multiply_scalar(screen_height/2));

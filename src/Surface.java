@@ -7,6 +7,11 @@ public class Surface {
     	return -1;	
     }
     
+    public Vector calcNormal(Vector point)
+    {
+    	return new Vector();
+    }
+    
     public boolean inDistance(Ray ray, float min, float max)
     {
     	return false;
@@ -14,6 +19,6 @@ public class Surface {
     
     public Material getMaterial(Scene scene)
     {
-    	return scene.materials.get(material);
+    	return scene.materials.get(material-1);
     }
 }

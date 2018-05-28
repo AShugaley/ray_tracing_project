@@ -7,6 +7,7 @@ public class Pixel {
 	Color[] colors; //super sampling rays colors
 	int index_i, index_j;
 	Random rand;
+	Color cellColor;
 	
 	public Pixel(int samplingLevel, int i, int j)
 	{
@@ -15,6 +16,7 @@ public class Pixel {
 		index_i = i;
 		index_j = j;
 		rand = new Random();
+		cellColor = new Color(0,0,0);
 	}
 	
 	/*
@@ -43,14 +45,16 @@ public class Pixel {
 						add(cam.screen.onePixel_up_direction.multiply_scalar((float)(n+randomY)));
 				PixelCellPoint = PixelCellPoint.add(topLeftPixelCorner);
 				
-				Vector rayDirection = new Vector(cam.position, PixelCellPoint);
-				rayDirection.toUnitVector();
+				Vector rayDirection = cam.position.substract(PixelCellPoint);
+				rayDirection.normalize();
 				
-				rays[index].updateRay(PixelCellPoint, rayDirection);
+		//		System.out.format("looking for index %d , length is %d\n", index, rays.length);
+				rays[index] = new Ray(PixelCellPoint, rayDirection);
 				index++;
+			//	System.out.format("index: %d \n", index);
 			}
 		}
-		
+		System.out.println("Finished set rays from pixel\n");
 	}
 	
 	
@@ -80,10 +84,9 @@ public class Pixel {
 
 	public void updateInPixelColor(Ray ray, int recursionCount, Scene scene, int index)
 	{
+		cellColor = new Color(0,0,0);
 		Color current = calculateInPixelColor(ray, recursionCount, scene, index);
-		colors[index].r = current.r;
-		colors[index].g = current.g;
-		colors[index].b = current.b;
+		colors[index] = new Color(current.r, current.g, current.b);
 	}
 	
 	
@@ -91,103 +94,236 @@ public class Pixel {
 	{
 		//colors[index]=...
 		//rays[index]
-		
-		Color cellColor = new Color(0,0,0);
-		
 		if(ray.min_distance_intersect < Float.MAX_VALUE && recursionCount < scene.max_recursion_level)
 		{	
-			addBackgroundColor(ray, recursionCount, scene, index, cellColor);
+			addBackgroundColor(ray, recursionCount, scene, index);
 			
-			Color diffuzedAndSpecular = new Color(0,0,0);
+			//Color diffuzedAndSpecular = new Color(0,0,0);
 			for (Light light : scene.lights)
 			{
-				float numOfLightHits = light.numOfLightRaysHits(ray, this.surfaces, this.numberOfShadowRays);
-				diffuzedAndSpecular = diffuzedAndSpecular.add(getDiffusedColor(ray,light, numOfLightHits));
-				if (light.mainRay > 0.001)
-					diffuzedAndSpecular = diffuzedAndSpecular.add(getSpecularColor(ray,light));
+				Vector start = light.position;
+				Vector dir = ray.getIntersectionPoint().substract(start);
+				light.lightRay = new Ray(start, dir);
+				
+				addDiffuseColor(ray, scene, index, light); 
+				if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+					System.out.format("dir: %f , after diffuse\n", ray.direction.x);
+					
+				addSpecularColor(ray, light, scene);
+				System.out.format("dir: %f , after spec\n", ray.direction.x);
+				if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+					System.out.format("inside!!!!!!! dir: %f , after spec\n", ray.direction.x);
+				
+				addReflectiveColor(ray, recursionCount, scene, index, light);
+				if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+					System.out.format("dir: %f , after reflect\n", ray.direction.x);
 				
 			}
-			diffuzedAndSpecular = diffuzedAndSpecular.scalarProduct(1-ray.surface.getTransparency());
-			return backGround.add(diffuzedAndSpecular).add(getReflectionColor(ray,time+1));
+			System.out.format("%f\n", cellColor.r);
+
+			return cellColor;
 		}
+		//a Ray that doesn't hit any surface 
 		else
 			return scene.background_color;
 	}
 	
 	
-	private void addBackgroundColor(Ray ray, int recursionCount, Scene scene, int index, Color cellColor)
+	private void addBackgroundColor(Ray ray, int recursionCount, Scene scene, int index)
 	{
-		int mtl = ray.closest_intersect.material;
+		if(ray.closest_intersect.getMaterial(scene).transparency <= 0)
+			return;
 		
 		//if the material is transparent- the recursion should continue to the background
-		if(scene.materials.get(mtl).transparency > 0) 
-		{	
-			Vector rayIntersection = ray.startPosition.add(ray.direction.multiply_scalar(ray.min_distance_intersect));	
-			Ray tansparancyRay = new Ray(rayIntersection, ray.direction);
-			tansparancyRay.checkTransRayIntersection(ray, scene);
-			Color backColor = calculateInPixelColor(tansparancyRay, recursionCount+1, scene, index);
-			
-			//cellColor += color of back surface * the front surface transparency
-			cellColor.add(backColor.multiply(scene.materials.get(mtl).transparency));
-		}
+		Vector rayIntersection = ray.startPosition.add(ray.direction.multiply_scalar(ray.min_distance_intersect));	
+		Ray tansparancyRay = new Ray(rayIntersection, ray.direction);
+		tansparancyRay.checkTransRayIntersection(ray, scene);
+		Color backColor = calculateInPixelColor(tansparancyRay, recursionCount+1, scene, index);
+		
+		//cellColor += color of back surface * the front surface transparency
+		cellColor.add(backColor.multiply_scalar(ray.closest_intersect.getMaterial(scene).transparency));
+		
+		if(Float.isNaN(ray.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		//System.out.format("Finished add background color, recursionCount is %d\n", recursionCount);
+
 	}
 	
-	private void addDiffuseColor(Ray ray, Scene scene, int index, Color cellColor) 
+	private void addDiffuseColor(Ray ray, Scene scene, int index, Light light) 
 	{	
-		int mtl = ray.closest_intersect.material;
-		
-		if(scene.materials.get(mtl).transparency == 1)
+		//final color = ... + (diffuse + specular) * (1- transp)
+		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
 			return; 
 		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		//if(Vector.dotProduct(ray.getNormal(), light.direction.getProjection(ray.getNormal())) >0 && ray.surface.getTransparency() < 0.2)
+		//	return this.black;
 		
-		if(Vector.dotProduct(ray.getNormal(), light.direction.getProjection(ray.getNormal())) >0 && ray.surface.getTransparency() < 0.2)
-			return this.black;
+		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
 		
-		float cos = Vector.dotProduct(ray.getNormal(), light.direction); //they both unit vector so no need to divide by the length
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
 		
-		Color lightIntensity = ray.surface.getDiffuseColor().multiply(light.color);
+		float normalLightCos = Math.abs(normal.dot_product(light.lightRay.direction));
 		
-		if (numOfLightHits == 0)
-			lightIntensity = lightIntensity.scalarProduct(1-light.shadowIntensity); 
-		else	
-			lightIntensity = lightIntensity.scalarProduct((float)(numOfLightHits)/this.squareNumberOfShadowRays);
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
 		
+		float softShadowPrecent = calcSoftShadowPrecent(light, ray, scene);
 		
-		//System.out.println("a - " +resultDiffuseColor);
-		return lightIntensity.scalarProduct(Math.abs(cos));
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Color lightColor = light.color;
+		Color MaterialDiffuse = ray.closest_intersect.getMaterial(scene).diffuse_color;
+		
+		Color lightIntensity = lightColor.multiply_color(MaterialDiffuse);
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Color diff = lightIntensity.multiply_scalar(softShadowPrecent);
+		diff = diff.multiply_scalar(normalLightCos);
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		cellColor.add(diff.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
+		
+	//	System.out.println("Finished add diffuse color\n");
 	}
 
-	private Color getSpecularColor(Ray ray, Light light) //need to be complete:
+	private void addSpecularColor(Ray ray, Light light, Scene scene) 
 	{
-		Vector b = light.direction.getProjection(ray.getNormal()).scalarProduct(-2);
-		Vector lightReflection = light.direction.add(b).toUnitVector();
-		float cos = Vector.dotProduct(ray.toCam, lightReflection);
-		//System.out.println(ray.surface.getSpecularColor());
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
+		float dotproduct = light.lightRay.direction.dot_product(normal);
+		dotproduct /= Math.pow(normal.calcLength(),2);
+		Vector normalized = normal.multiply_scalar(dotproduct);
+		
+		Vector temp = normalized.multiply_scalar(-2);
+		Vector lightReflection = light.lightRay.direction.add(temp);
+		lightReflection.normalize();
+		Vector intersection_flip = ray.direction.multiply_scalar(-1.0f);
+		float cos = intersection_flip.dot_product(lightReflection);
+
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Color specular = new Color(0,0,0);
 		if(cos>0)
 		{
-			Color c = ray.surface.getSpecularColor().multiply(light.color).
-					scalarProduct((float)(Math.pow(cos, ray.surface.getPhong())*light.specularIntensity));
-			return c;
+			float phong = ray.closest_intersect.getMaterial(scene).phong_specularity_coefficient;
+			specular = ray.closest_intersect.getMaterial(scene).specular_color;
+			specular = specular.multiply_color(light.color);
+			specular= specular.multiply_scalar((float)(Math.pow(cos, phong)*light.specular_intensity));
 		}
-		return this.black;
+		
+		cellColor.add(specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
+		//System.out.println("Finished add specular color\n");
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
 	}
 	
-	private Color getReflectionColor(Ray ray, int time)
+	private void addReflectiveColor(Ray ray, int recursionCount, Scene scene, int index, Light light)
 	{
-		Vector b = ray.direction.getProjection(ray.getNormal()).scalarProduct(-2);
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
 		
-		iSurface i = ray.surface;
-		ray.setNewRay(ray.intersection, ray.direction.add(b));
+		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
+		float dotproduct = light.lightRay.direction.dot_product(normal);
+		dotproduct /= Math.pow(normal.calcLength(),2);
+		Vector normalized = normal.multiply_scalar(dotproduct);
 		
-		for(iSurface surface: this.surfaces)
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Vector temp = normalized.multiply_scalar(-2);
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		ray.updateRay(ray.startPosition, ray.direction.add(temp));
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		ray.checkTransRayIntersection(ray, scene);
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		Color reflective = calculateInPixelColor(ray, recursionCount+1, scene, index);
+		reflective = reflective.multiply_color(ray.closest_intersect.getMaterial(scene).reflection_color);
+			
+		cellColor.add(reflective);
+		//System.out.format("Finished add reflective color, recursionCount is %d\n", recursionCount);
+		
+		if(Float.isNaN(ray.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+	}
+
+	private float calcSoftShadowPrecent(Light light, Ray ray, Scene scene)
+	{
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		light.lightRay.startPosition = light.position;
+		light.lightRay.direction = ray.getIntersectionPoint().substract(light.lightRay.startPosition);
+		light.lightRay.direction.normalize();
+		light.lightRay.min_distance_intersect = light.position.substract(ray.getIntersectionPoint()).calcLength();
+	
+		//light from the center point only 
+		float pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
+		if(scene.number_shadow_rays == 1)
+			return pointLightIntense;
+		
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
+		
+		//light from radius, numofShadowRays rays will be shoot
+		float lightIntese = 0;
+		
+		//////////////
+		Vector aroundLightX = light.lightRay.direction.cross_product(new Vector(1,1,1));
+		if(aroundLightX.x == 0 && aroundLightX.y == 0 && aroundLightX.z == 0)
+			aroundLightX =  light.lightRay.direction.cross_product(new Vector(1,0,0));
+		
+		Vector aroundLightY = light.lightRay.direction.cross_product(aroundLightX);
+		aroundLightX.normalize();
+		aroundLightY.normalize();
+		Vector circlePoint = light.position.add(aroundLightX.multiply_scalar(-light.radius/2)).add(aroundLightY.multiply_scalar(-light.radius/2));
+		aroundLightX = aroundLightX.multiply_scalar(light.radius/scene.number_shadow_rays);
+		aroundLightY = aroundLightY.multiply_scalar(light.radius/scene.number_shadow_rays);
+	////////////
+		
+		for(int i=0; i<scene.number_shadow_rays; i++)		
 		{
-			if(surface == i)
-				continue;
-			surface.intersectes(ray);
+			for(int j=0; j<scene.number_shadow_rays; j++)
+			{
+				if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+					System.out.format("dir: %f , after reflect\n", ray.direction.x);
+				
+				light.lightRay.startPosition = circlePoint.add(aroundLightX.multiply_scalar((float)(i+rand.nextDouble()))).add(aroundLightY.multiply_scalar((float)(j+rand.nextDouble())));
+				light.lightRay.direction = ray.getIntersectionPoint().substract(light.lightRay.startPosition);
+				
+				if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+					System.out.format("dir: %f , after reflect\n", ray.direction.x);
+				
+				light.lightRay.direction.normalize(); 
+				
+				lightIntese += light.lightRay.checkLightRayIntersection(scene);
+			}
 		}
-		ray.getIntersection();
+		if(Float.isNaN(ray.direction.x) || Float.isNaN(light.lightRay.direction.x))
+			System.out.format("dir: %f , after reflect\n", ray.direction.x);
 		
-		return getColorFromRay(ray,time).multiply(i.getReflectionColor());
+		return Math.max(lightIntese, 1-light.shadow_intensity)/(float)Math.pow(scene.number_shadow_rays, 2);
 	}
 
 }

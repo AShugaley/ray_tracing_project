@@ -2,6 +2,12 @@ public class InfinitePlane extends Surface {
     public Vector normal;
     public Float offset;
     
+    @Override
+    public Vector calcNormal(Vector point)
+    {
+    	normal.normalize();
+    	return normal;
+    }
     
     /*
      * The function calculate a ray-surface intersect, according to the surface type.
@@ -15,7 +21,7 @@ public class InfinitePlane extends Surface {
     {
 		// assuming vectors are all normalized
 		Vector intersectionPoint = normal.multiply_scalar(offset);
-		normal.toUnitVector();
+		normal.normalize();
 	    float denom = normal.dot_product(ray.direction); 
 	    if (denom > epsilon) 
 	    { 

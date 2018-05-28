@@ -24,7 +24,7 @@ public class Color {
 		b += c.b;
 	}
 	
-	public Color multiply(float a)
+	public Color multiply_scalar(float a)
 	{
 		return new Color(r*a, g*a, b*a);
 	}
@@ -49,4 +49,10 @@ public class Color {
 		return res; 
 	}
 	
+	
+	public Color multiply_color(Color other)
+	{
+		Color ret = new Color(r * other.r, g * other.g, b * other.b);
+		return ret;
+	}
 }

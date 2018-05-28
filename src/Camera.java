@@ -14,14 +14,14 @@ public class Camera {
     	up_vector = up;
     	
     	look_at_direction = new Vector(position, look_at_point);
-    	look_at_direction.toUnitVector();
+    	look_at_direction.normalize();
     	
     	//Fix the up vector so it will be perpendicular to the direction 
     	//that the camera looks at.
     	Vector lookAt_up_normal = look_at_direction.cross_product(up_vector);
 		up_vector = look_at_direction.cross_product(lookAt_up_normal);
 		up_vector.multiply_scalar(-1);  
-		up_vector.toUnitVector();
+		up_vector.normalize();
     }
    
 }

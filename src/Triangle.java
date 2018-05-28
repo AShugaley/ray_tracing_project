@@ -3,6 +3,20 @@ public class Triangle extends Surface {
     public Vector v2;
     public Vector v3;
     
+    @Override
+    public Vector calcNormal(Vector point)
+    {
+    	// compute triangle's normal
+	    Vector v1v2 = v2.substract(v1); 
+	    Vector v1v3 = v3.substract(v1); 
+	   
+	    // no need to normalize
+	    Vector normal = v1v2.cross_product(v1v3); 
+	    normal.normalize();
+	    return normal;
+    }
+    
+    
     /*
      * The function calculate a ray-surface intersect, according to the surface type.
      *  
@@ -13,12 +27,7 @@ public class Triangle extends Surface {
     @Override
     public float intersectDist(Ray ray)
 	{ 
-	    // compute triangle's normal
-	    Vector v1v2 = v2.substract(v1); 
-	    Vector v1v3 = v3.substract(v1); 
-	   
-	    // no need to normalize
-	    Vector normal = v1v2.cross_product(v1v3);  
+	     Vector normal = calcNormal(new Vector());
 	   	    
 	    // First: finding the point of the ray's intersection with the triangle
 	    // check if ray and plane are parallel:

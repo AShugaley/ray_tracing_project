@@ -4,6 +4,7 @@ public class Ray
 	Vector direction;
 	Surface closest_intersect;
 	float min_distance_intersect;
+	//Vector intersection_point;
 	//float length;
 	
 	
@@ -33,13 +34,28 @@ public class Ray
 		for(Surface surface: scene.surfaces)
 		{
 			dist = surface.intersectDist(this); //dist = -1 means there is no intersection
-			if(dist > 0 && dist < min_distance_intersect)
+			if(dist > Surface.epsilon && dist + Surface.epsilon < min_distance_intersect)
 			{
 				min_distance_intersect = dist;
 				closest_intersect = surface;
 			}
 		}
 	}
+	
+	public float checkLightRayIntersection(Scene scene)
+	{
+		float res=0, dist; 
+		for(Surface surface: scene.surfaces)
+		{
+			dist = surface.intersectDist(this); //dist = -1 means there is no intersection
+			if(dist > Surface.epsilon && dist + Surface.epsilon < min_distance_intersect)
+			{
+				res *= surface.getMaterial(scene).transparency;
+			}
+		}
+		return res;
+	}
+	
 	
 	public void checkTransRayIntersection(Ray originRay, Scene scene)
 	{
@@ -58,6 +74,10 @@ public class Ray
 		}		
 	}
 	
+	public Vector getIntersectionPoint()
+	{
+		return startPosition.add(direction.multiply_scalar(min_distance_intersect));
+	}
 	//public void updateRayLength(float l)
 	//{
 	//	length = l;

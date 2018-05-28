@@ -12,10 +12,10 @@ public class Parser {
 
     public static Scene parseFile(String file){
         Scene result = new Scene();
-        URL url = result.getClass().getResource(file);
-        File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
+       // URL url = result.getClass().getResource(file);
+       // File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
 
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] splited = line.split("\\s+");
@@ -87,8 +87,8 @@ public class Parser {
 
         l.position = new Vector(line[1],line[2],line[3]);
         l.color = new Color(line[4],line[5],line[6]);
-        l.specular_intencity = Float.parseFloat(line[7]);
-        l.shadow_intencity = Float.parseFloat(line[8]);
+        l.specular_intensity = Float.parseFloat(line[7]);
+        l.shadow_intensity = Float.parseFloat(line[8]);
         l.radius = Float.parseFloat(line[9]);
 
         s.lights.add(l);
