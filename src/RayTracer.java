@@ -112,48 +112,78 @@ public class RayTracer {
             {
                 String code = line.substring(0, 3).toLowerCase();
                 // Split according to white space characters:
-                String[] params = line.substring(3).trim().toLowerCase().split("\\s+");
+                String[] params = line.toLowerCase().split("\\s+");
  
                 if (code.equals("cam"))
                 {
-                                        // Add code here to parse camera parameters
- 
+                    Vector position = new Vector(params[1],params[2],params[3]);
+                    Vector look_at_point = new Vector(params[4],params[5],params[6]);
+                    Vector up_vector = new Vector(params[7],params[8],params[9]);
+                    float screen_distance = Float.parseFloat(params[10]);
+                    float screen_width = Float.parseFloat(params[11]);
+
+                    Camera c = new Camera(position, look_at_point, up_vector, screen_distance, screen_width);
+                    scene.camera = c;
                     System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
                 }
                 else if (code.equals("set"))
                 {
-                                        // Add code here to parse general settings parameters
- 
+                    scene.background_color = new Color(params[1],params[2],params[3]);
+                    scene.number_shadow_rays = Integer.parseInt(params[4]);
+                    scene.max_recursion_level = Integer.parseInt(params[5]);
+                    scene.super_sampling_level = Integer.parseInt(params[6]);
+
                     System.out.println(String.format("Parsed general settings (line %d)", lineNum));
                 }
                 else if (code.equals("mtl"))
                 {
-                                        // Add code here to parse material parameters
- 
+                    Material m = new Material();
+
+                    m.diffuse_color = new Color(params[1],params[2],params[3]);
+                    m.specular_color = new Color(params[4],params[5],params[6]);
+                    m.reflection_color = new Color(params[7],params[8],params[9]);
+                    m.phong_specularity_coefficient = Float.parseFloat(params[10]);
+                    m.transparency = Float.parseFloat(params[11]);
+
+                    scene.materials.add(m);
                     System.out.println(String.format("Parsed material (line %d)", lineNum));
                 }
                 else if (code.equals("sph"))
                 {
-                                        // Add code here to parse sphere parameters
- 
-                                        // Example (you can implement this in many different ways!):
-                    // Sphere sphere = new Sphere();
-                                        // sphere.setCenter(params[0], params[1], params[2]);
-                                        // sphere.setRadius(params[3]);
-                                        // sphere.setMaterial(params[4]);
- 
+                    Sphere sc = new Sphere();
+
+                    sc.center_position =  new Vector(params[1],params[2],params[3]);
+                    sc.radius = Float.parseFloat(params[4]);
+                    sc.material = Integer.parseInt(params[5]);
+
+                    scene.surfaces.add(sc);
+
                     System.out.println(String.format("Parsed sphere (line %d)", lineNum));
                 }
                 else if (code.equals("pln"))
                 {
-                                        // Add code here to parse plane parameters
+                    InfinitePlane p = new InfinitePlane();
+
+                    p.normal = new Vector(params[1],params[2],params[3]);
+                    p.offset = Float.parseFloat(params[4]);
+                    p.material = Integer.parseInt(params[5]);
+
+
+                    scene.surfaces.add(p);            // Add code here to parse plane parameters
  
                     System.out.println(String.format("Parsed plane (line %d)", lineNum));
                 }
                 else if (code.equals("lgt"))
                 {
-                                        // Add code here to parse light parameters
- 
+                    Triangle t = new Triangle();
+
+                    t.v1 = new Vector(params[1],params[2],params[3]);
+                    t.v2 = new Vector(params[4],params[5],params[6]);
+                    t.v3 = new Vector(params[7],params[8],params[9]);
+                    t.material = Integer.parseInt(params[10]);
+
+                    scene.surfaces.add(t);
+
                     System.out.println(String.format("Parsed light (line %d)", lineNum));
                 }
                 else
