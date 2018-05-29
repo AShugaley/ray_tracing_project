@@ -60,9 +60,9 @@ public class RayTracer {
  
             // Parse scene file:
             //TODO - light that line when parser will be update 
-           // tracer.parseScene(sceneFileName);
+           //tracer.parseScene(sceneFileName);
             
-            //delete that after parser update 
+            //TODO - delete that after parser update 
             tracer.scene = Parser.parseFile(sceneFileName);
          
             // Render scene:
