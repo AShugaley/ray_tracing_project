@@ -23,9 +23,9 @@ public class InfinitePlane extends Surface {
 		Vector intersectionPoint = normal.multiply_scalar(offset);
 		normal.normalize();
 	    float denom = normal.dot_product(ray.direction);
-	    if (denom > epsilon) 
+	    if (Math.abs(denom) > epsilon)
 	    { 
-	        Vector rayPlane = intersectionPoint.substract(ray.startPosition);
+	        Vector rayPlane = ray.startPosition.substract(intersectionPoint);
 	        float dist = rayPlane.dot_product(normal) / denom; 
 	        if(dist < 0)
 	        	return -1;

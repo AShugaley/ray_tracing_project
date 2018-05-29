@@ -43,8 +43,8 @@ public class RayTracer {
             RayTracer tracer = new RayTracer();
  
                         // Default values:
-            tracer.imageWidth = 500;
-            tracer.imageHeight = 500;
+            tracer.imageWidth = 100;
+            tracer.imageHeight = 100;
  
             if (args.length < 2)
                 throw new RayTracerException("Not enough arguments provided. Please specify an input scene file and an output image file for rendering.");
@@ -229,8 +229,12 @@ public class RayTracer {
 		
 		for(int i=0; i<imageHeight; i++)
 		{
+		    if(i == 50)
+		        System.out.println("HELLLOOOOOO");
 			for(int j=0; j<imageWidth; j++)
 			{
+                if(j == 50)
+                    System.out.println("HELLLOOOOOO");
 				pixels[i][j] = new Pixel(scene.super_sampling_level, i, j);
 				
 				//For each pixel fill the rays array 

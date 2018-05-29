@@ -41,7 +41,7 @@ public class Screen {
 		//Go to the left
 		topLeft_screen_corner = topLeft_screen_corner.add(right.multiply_scalar((-1)*screen_width/2));
 			
-		onePixel_up_direction = cam.up_vector.multiply_scalar(screen_height/imageHeight);
+		onePixel_up_direction = cam.up_vector.multiply_scalar((-1)*screen_height/imageHeight);
 		onePixel_right_direction = right.multiply_scalar(screen_width/imageWidth);
 		
 	//	this.backToStart = this.pixelWidthDirection.scalarProduct(-x);

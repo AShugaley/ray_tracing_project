@@ -44,7 +44,7 @@ public class Ray
 	
 	public float checkLightRayIntersection(Scene scene)
 	{
-		float res=0, dist; 
+		float res=1, dist;
 		for(Surface surface: scene.surfaces)
 		{
 			dist = surface.intersectDist(this); //dist = -1 means there is no intersection
