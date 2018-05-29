@@ -36,7 +36,7 @@ public class Vector {
     }
 
     public Vector substract(Vector other){
-    	return new Vector(this.x - other.x, this.y - other.y,  this.z - other.z);
+    	return new Vector(other.x - this.x, other.y - this.y,  other.z - this.z);
     }
 
     public Vector multiply_scalar(float a){ 
@@ -72,7 +72,10 @@ public class Vector {
 
     public void normalize()
 	{
-		this.multiply_scalar(1/this.calcLength());
+		Vector v = this.multiply_scalar(1/this.calcLength());
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
 	}
 
 

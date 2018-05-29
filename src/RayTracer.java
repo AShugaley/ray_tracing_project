@@ -11,7 +11,7 @@ import java.lang.Math;
 
  
 import javax.imageio.ImageIO;
- 
+import java.net.URL;
 /**
  *  Main class for ray tracing exercise.
  */
@@ -57,13 +57,16 @@ public class RayTracer {
                 tracer.imageWidth = Integer.parseInt(args[2]);
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
+
+            sceneFileName = "Pool.txt";
+            outputFileName = "Pool_res.png";
  
             // Parse scene file:
             //TODO - light that line when parser will be update 
-           //tracer.parseScene(sceneFileName);
+            tracer.parseScene(sceneFileName);
             
-            //TODO - delete that after parser update 
-            tracer.scene = Parser.parseFile(sceneFileName);
+            //TODO- delete that after parser update 
+            //tracer.scene = Parser.parseFile(sceneFileName);
          
             // Render scene:
             tracer.renderScene(outputFileName);
@@ -80,17 +83,21 @@ public class RayTracer {
     ///////DELETE//////
     public static void runTests(){
         //Tests.vectorTests();
-        Tests.parserTests();
+        //Tests.parserTests();
     }
     
     
-    //TODO - ALEX - merge with our parser
     /**
      * Parses the scene file and creates the scene. Change this function so it generates the required objects.
      */
     public void parseScene(String sceneFileName) throws IOException, RayTracerException
     {
-        FileReader fr = new FileReader(sceneFileName);
+    	// FileReader fr = new FileReader(sceneFileName);
+        scene = new Scene();
+        URL url = scene.getClass().getResource(sceneFileName);
+        File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
+
+        FileReader fr = new FileReader(f);
  
         BufferedReader r = new BufferedReader(fr);
         String line = null;
@@ -175,14 +182,15 @@ public class RayTracer {
                 }
                 else if (code.equals("lgt"))
                 {
-                    Triangle t = new Triangle();
+                    Light l = new Light();
 
-                    t.v1 = new Vector(params[1],params[2],params[3]);
-                    t.v2 = new Vector(params[4],params[5],params[6]);
-                    t.v3 = new Vector(params[7],params[8],params[9]);
-                    t.material = Integer.parseInt(params[10]);
+                    l.position = new Vector(params[1],params[2],params[3]);
+                    l.color = new Color(params[4],params[5],params[6]);
+                    l.specular_intensity = Float.parseFloat(params[7]);
+                    l.shadow_intensity = Float.parseFloat(params[8]);
+                    l.radius = Float.parseFloat(params[9]);
 
-                    scene.surfaces.add(t);
+                    scene.lights.add(l);
 
                     System.out.println(String.format("Parsed light (line %d)", lineNum));
                 }
@@ -216,7 +224,7 @@ public class RayTracer {
         // Put your ray tracing code here!
         pixels = new Pixel[imageHeight][imageWidth];
         scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
-        
+        scene.max_recursion_level = 2;
 		//TODO - if there are no surfaces - create background and exit
 		
 		for(int i=0; i<imageHeight; i++)
