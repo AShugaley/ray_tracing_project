@@ -40,7 +40,7 @@ public class Pixel {
 			{
 				randomX = rand.nextDouble();
 				randomY = rand.nextDouble();
-				
+
 				Vector PixelCellPoint = cam.screen.PixelCell_right_direction.multiply_scalar((float)(m+randomX)).
 						add(cam.screen.PixelCell_up_direction.multiply_scalar((float)(n+randomY)));
 				PixelCellPoint = PixelCellPoint.add(topLeftPixelCorner);
@@ -67,10 +67,10 @@ public class Pixel {
 	public void calculatePixelColor(byte[] rgbData, int imageWidth)
 	{
 		Color finalColor = Color.average(colors);
-		
-		rgbData[(index_i* imageWidth + index_j)*3] = (byte)(finalColor.r*255);
-		rgbData[(index_i*imageWidth + index_j)*3 + 1] = (byte)(finalColor.g*255);
-		rgbData[(index_i*imageWidth + index_j)*3 + 2] = (byte)(finalColor.b*255);
+
+		rgbData[(index_i*imageWidth + index_j)*3] = (byte)(Math.min(finalColor.r*255, 254));
+		rgbData[(index_i*imageWidth + index_j)*3 + 1] = (byte)(Math.min(finalColor.g*255, 254));
+		rgbData[(index_i*imageWidth + index_j)*3 + 2] = (byte)(Math.min(finalColor.b*255, 254));
 	
 		//
         // Write pixel color values in RGB format to rgbData:
@@ -86,6 +86,7 @@ public class Pixel {
 	{
 		cellColor = new Color(0,0,0);
 		Color current = calculateInPixelColor(ray, recursionCount, scene, index);
+		//current.normalize();
 		colors[index] = new Color(current.r, current.g, current.b);
 	}
 	
@@ -102,20 +103,32 @@ public class Pixel {
 			for (Light light : scene.lights)
 			{
 				Vector start = light.position;
+				//Vector dir = ray.getIntersectionPoint().substract(start);
 				Vector dir = start.substract(ray.getIntersectionPoint());
+
 				dir.normalize();
 				light.lightRay = new Ray(start, dir);
-				
-				addDiffuseColor(ray, scene, index, light); 
+				addDiffuseColor(ray, scene, index, light);
+
+//				dir = start.substract(ray.getIntersectionPoint()
+ 				dir = ray.getIntersectionPoint().substract(start);
+
+				dir.normalize();
+				light.lightRay = new Ray(start, dir);
 
 				addSpecularColor(ray, light, scene);
 
 
 			}
-			if( cellColor.r > 1.0)
+
+			if( cellColor.r > 1.0 || cellColor.g > 1.0 || cellColor.b > 1.0 ) {
 				System.out.format("%f\n", cellColor.r);
-			addReflectiveColor(ray, recursionCount, scene, index);
+				//cellColor.normalize();
+			}
+			addReflectiveColor(ray, recursionCount+1, scene, index);
+
 			System.out.format("%f\n", cellColor.r);
+
 			return cellColor;
 		}
 		//a Ray that doesn't hit any surface 
@@ -137,38 +150,51 @@ public class Pixel {
 		
 		//cellColor += color of back surface * the front surface transparency
 		cellColor.add(backColor.multiply_scalar(ray.closest_intersect.getMaterial(scene).transparency));
-		System.out.println("cellColor");
-		System.out.println(cellColor.r);
+
 		//System.out.format("Finished add background color, recursionCount is %d\n", recursionCount);
 
 	}
 	
 	private void addDiffuseColor(Ray ray, Scene scene, int index, Light light) 
-	{	
+	{
+		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
+			return;
+		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
+
+		float dotproduct = light.lightRay.direction.dot_product(normal);
+		dotproduct /= normal.calcLength();
+		Vector normalized = normal.multiply_scalar(dotproduct);
+		float a = normal.dot_product(normalized);
+		if(a>0&&ray.closest_intersect.getMaterial(scene).transparency < 0.2)
+			return;
+
+
+
+
 		//final color = ... + (diffuse + specular) * (1- transp)
 		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
-			return; 
-		
+			return;
+
 			//if(Vector.dotProduct(ray.getNormal(), light.direction.getProjection(ray.getNormal())) >0 && ray.surface.getTransparency() < 0.2)
 		//	return this.black;
-		
-		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
-		
+
+
 
 		float normalLightCos = Math.abs(normal.dot_product(light.lightRay.direction));
 
 		float softShadowPrecent = calcSoftShadowPrecent(light, ray, scene);
-		
+		if(softShadowPrecent != 1)
+			System.out.println("h");
+		//float softShadowPrecent = 1;
+
 
 		Color lightColor = light.color;
 		Color MaterialDiffuse = ray.closest_intersect.getMaterial(scene).diffuse_color;
 		
 		Color lightIntensity = lightColor.multiply_color(MaterialDiffuse);
-		
 
-		Color diff = lightIntensity.multiply_scalar(softShadowPrecent);
+		Color diff = lightIntensity.multiply_scalar(softShadowPrecent);  //CHANGE
 		diff = diff.multiply_scalar(normalLightCos);
-
 
 		cellColor.add(diff.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
 
@@ -179,6 +205,14 @@ public class Pixel {
 	{
 
 		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
+
+		if(ray.closest_intersect instanceof Sphere){
+			Sphere s = (Sphere) ray.closest_intersect;
+			normal = ray.getIntersectionPoint().substract(s.center_position);
+			normal.normalize();
+		}
+
+
 		float dotproduct = light.lightRay.direction.dot_product(normal);
 		dotproduct /= Math.pow(normal.calcLength(),2);
 		Vector normalized = normal.multiply_scalar(dotproduct);
@@ -186,7 +220,7 @@ public class Pixel {
 		Vector temp = normalized.multiply_scalar(-2);
 		Vector lightReflection = light.lightRay.direction.add(temp);
 		lightReflection.normalize();
-		Vector intersection_flip = ray.direction.multiply_scalar(-1.0f);
+		Vector intersection_flip = ray.direction.multiply_scalar(1.0f);
 		float cos = intersection_flip.dot_product(lightReflection);
 
 
@@ -198,6 +232,8 @@ public class Pixel {
 			specular = specular.multiply_color(light.color);
 			specular= specular.multiply_scalar((float)(Math.pow(cos, phong)*light.specular_intensity));
 		}
+
+		Color t = specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency);
 		
 		cellColor.add(specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
 		//System.out.println("Finished add specular color\n");
@@ -206,6 +242,12 @@ public class Pixel {
 	
 	private void addReflectiveColor(Ray ray, int recursionCount, Scene scene, int index)
 	{
+
+
+
+
+
+
 
 		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
 		float dotproduct = ray.direction.dot_product(normal);
@@ -224,8 +266,8 @@ public class Pixel {
 		
 
 		Color reflective = calculateInPixelColor(ray, recursionCount+1, scene, index);
+//		Color reflective = new Color(0,0,0);
 		reflective = reflective.multiply_color(ray.closest_intersect.getMaterial(scene).reflection_color);
-			
 		cellColor.add(reflective);
 		//System.out.format("Finished add reflective color, recursionCount is %d\n", recursionCount);
 		
@@ -242,6 +284,9 @@ public class Pixel {
 	
 		//light from the center point only 
 		float pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
+		if(pointLightIntense!=1)
+			System.out.println("hj");
+		pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
 		if(scene.number_shadow_rays == 1)
 			return pointLightIntense;
 		
@@ -268,7 +313,7 @@ public class Pixel {
 			{
 
 				light.lightRay.startPosition = circlePoint.add(aroundLightX.multiply_scalar((float)(i+rand.nextDouble()))).add(aroundLightY.multiply_scalar((float)(j+rand.nextDouble())));
-				light.lightRay.direction = ray.getIntersectionPoint().substract(light.lightRay.startPosition);
+				light.lightRay.direction = light.lightRay.startPosition.substract(ray.getIntersectionPoint());
 				
 
 				light.lightRay.direction.normalize();
@@ -276,7 +321,9 @@ public class Pixel {
 				lightIntese += light.lightRay.checkLightRayIntersection(scene);
 			}
 		}
-
+		if(Math.max(lightIntese, 1-light.shadow_intensity) / (float)Math.pow(scene.number_shadow_rays, 2) != 1.0)
+			System.out.println("MAX");
+//		System.out.println(lightIntese);
 		return Math.max(lightIntese, 1-light.shadow_intensity) / (float)Math.pow(scene.number_shadow_rays, 2);
 	}
 

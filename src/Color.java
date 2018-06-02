@@ -55,4 +55,14 @@ public class Color {
 		Color ret = new Color(r * other.r, g * other.g, b * other.b);
 		return ret;
 	}
+
+
+	public void normalize()
+	{
+		Vector temp = new Vector(r,g,b);
+		temp.normalize();
+		this.r = temp.x;
+		this.g = temp.y;
+		this.b = temp.z;
+	}
 }

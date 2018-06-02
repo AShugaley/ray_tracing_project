@@ -6,8 +6,10 @@ public class Sphere extends Surface {
     @Override
     public Vector calcNormal(Vector point)
     {
-    	Vector normal = point.substract(center_position);
-    	normal.normalize();
+    	Vector normal = center_position.substract(point);
+//		Vector normal = point.substract(center_position);
+
+		normal.normalize();
     	return normal;  	
     }
     
