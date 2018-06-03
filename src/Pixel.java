@@ -121,10 +121,6 @@ public class Pixel {
 
 			}
 
-			if( cellColor.r > 1.0 || cellColor.g > 1.0 || cellColor.b > 1.0 ) {
-				System.out.format("%f\n", cellColor.r);
-				//cellColor.normalize();
-			}
 			addReflectiveColor(ray, recursionCount+1, scene, index);
 
 			System.out.format("%f\n", cellColor.r);
@@ -183,9 +179,8 @@ public class Pixel {
 		float normalLightCos = Math.abs(normal.dot_product(light.lightRay.direction));
 
 		float softShadowPrecent = calcSoftShadowPrecent(light, ray, scene);
-		if(softShadowPrecent != 1)
-			System.out.println("h");
-		//float softShadowPrecent = 1;
+
+	//	float softShadowPrecent = 1;
 
 
 		Color lightColor = light.color;

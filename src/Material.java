@@ -5,6 +5,4 @@ public class Material {
     public Color reflection_color;
     public float phong_specularity_coefficient;
     public float transparency;
-
-
 }

@@ -4,13 +4,9 @@ public class Ray
 	Vector direction;
 	Surface closest_intersect;
 	float min_distance_intersect;
-	//Vector intersection_point;
-	//float length;
-	
 	
 	public Ray() 
 	{
-		//length = Float.MAX_VALUE;
 		min_distance_intersect = Float.MAX_VALUE;
 	};
 	
@@ -18,7 +14,6 @@ public class Ray
 	{
 		startPosition = start;
 		direction = dir;
-		//length = Float.MAX_VALUE;
 		min_distance_intersect = Float.MAX_VALUE;
 	}
 	
@@ -78,9 +73,6 @@ public class Ray
 	{
 		return startPosition.add(direction.multiply_scalar(min_distance_intersect));
 	}
-	//public void updateRayLength(float l)
-	//{
-	//	length = l;
-	//}
+
 
 }

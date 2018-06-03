@@ -12,14 +12,7 @@ public class Sphere extends Surface {
 		normal.normalize();
     	return normal;  	
     }
-    
-    /*
-     * The function calculate a ray-surface intersect, according to the surface type.
-     *  
-     * @Return - float distance of the ray-surface intersect, 
-     * the return value will be -1 if there is no intersect
-     * 
-     */
+
     @Override
     public float intersectDist(Ray ray) 
     {

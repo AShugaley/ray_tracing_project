@@ -48,21 +48,11 @@ public class Color {
 		Color res = new Color(avg_r, avg_g, avg_b);
 		return res; 
 	}
-	
-	
+
 	public Color multiply_color(Color other)
 	{
 		Color ret = new Color(r * other.r, g * other.g, b * other.b);
 		return ret;
 	}
 
-
-	public void normalize()
-	{
-		Vector temp = new Vector(r,g,b);
-		temp.normalize();
-		this.r = temp.x;
-		this.g = temp.y;
-		this.b = temp.z;
-	}
 }

@@ -1,16 +1,10 @@
 
 public class Vector {
 
-    //public float[] members;
     float x,y,z;
 
     public Vector(){}
 
-    /*public Vector(float[] members){
-        if(members.length != 3)
-            throw new IllegalArgumentException();
-        this.members = new float[]{members[0],members[1],members[2]};
-    }*/
 
     public Vector(float x, float y, float z){
         this.x = x;

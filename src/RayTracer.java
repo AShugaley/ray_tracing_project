@@ -30,13 +30,8 @@ public class RayTracer {
 		image = new float[imageWidth][imageHeight];
 	}
  
-    /**
-     * Runs the ray tracer. Takes scene file, output image file and image size as input.
-     */
+
     public static void main(String[] args) {
- 
-    	/////////DELETE////////
-    	//runTests();
     	
         try {
  
@@ -58,21 +53,17 @@ public class RayTracer {
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
 
-            sceneFileName = "Pool.txt";
+            sceneFileName = "Room1.txt";
             outputFileName = "Pool_res.png";
  
-            // Parse scene file:
-            //TODO - light that line when parser will be update 
+
             tracer.parseScene(sceneFileName);
             
-            //delete that after parser update 
-            //tracer.scene = Parser.parseFile(sceneFileName);
-         
-            // Render scene:
+
             tracer.renderScene(outputFileName);
  
-//      } catch (IOException e) {
-//          System.out.println(e.getMessage());
+        } catch (IOException e) {
+          System.out.println(e.getMessage());
         } catch (RayTracerException e) {
             System.out.println(e.getMessage());
         } catch (Exception e) {
@@ -80,17 +71,7 @@ public class RayTracer {
         }
     }
  
-    ///////DELETE//////
-    public static void runTests(){
-        //Tests.vectorTests();
-        //Tests.parserTests();
-    }
-    
-    
-    //TODO - ALEX - merge with our parser
-    /**
-     * Parses the scene file and creates the scene. Change this function so it generates the required objects.
-     */
+
     public void parseScene(String sceneFileName) throws IOException, RayTracerException
     {
         scene = new Scene();
@@ -180,12 +161,11 @@ public class RayTracer {
  
                     System.out.println(String.format("Parsed plane (line %d)", lineNum));
                 }
-                else if (code.equals("lgt"))
-                {
+                else if (code.equals("lgt")) {
                     Light l = new Light();
 
-                    l.position = new Vector(params[1],params[2],params[3]);
-                    l.color = new Color(params[4],params[5],params[6]);
+                    l.position = new Vector(params[1], params[2], params[3]);
+                    l.color = new Color(params[4], params[5], params[6]);
                     l.specular_intensity = Float.parseFloat(params[7]);
                     l.shadow_intensity = Float.parseFloat(params[8]);
                     l.radius = Float.parseFloat(params[9]);
@@ -193,6 +173,17 @@ public class RayTracer {
                     scene.lights.add(l);
 
                     System.out.println(String.format("Parsed light (line %d)", lineNum));
+                }
+                else if (code.equals("trg")) {
+                    Triangle t = new Triangle();
+
+                    t.v1 = new Vector(params[1],params[2],params[3]);
+                    t.v2 = new Vector(params[4],params[5],params[6]);
+                    t.v3 = new Vector(params[7],params[8],params[9]);
+                    t.material = Integer.parseInt(params[10]);
+
+                    scene.surfaces.add(t);
+                    System.out.println(String.format("Parsed triangle (line %d)", lineNum));
                 }
                 else
                 {
