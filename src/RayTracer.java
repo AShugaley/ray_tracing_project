@@ -58,8 +58,8 @@ public class RayTracer {
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
 
-            sceneFileName = "Pool.txt";
-            outputFileName = "Pool_res.png";
+            //sceneFileName = "Pool.txt";
+            //outputFileName = "Pool_res.png";
  
             // Parse scene file:
             //TODO - light that line when parser will be update 
@@ -92,12 +92,12 @@ public class RayTracer {
      */
     public void parseScene(String sceneFileName) throws IOException, RayTracerException
     {
-    	// FileReader fr = new FileReader(sceneFileName);
+    	FileReader fr = new FileReader(sceneFileName);
         scene = new Scene();
-        URL url = scene.getClass().getResource(sceneFileName);
-        File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
+        //URL url = scene.getClass().getResource(sceneFileName);
+        //File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
 
-        FileReader fr = new FileReader(f);
+       // FileReader fr = new FileReader(file);
  
         BufferedReader r = new BufferedReader(fr);
         String line = null;
