@@ -95,9 +95,10 @@ public class Pixel {
 	{
 		//colors[index]=...
 		//rays[index]
+		Color thisColot = new Color(0,0,0);
 		if(ray.min_distance_intersect < Float.MAX_VALUE && recursionCount < scene.max_recursion_level)
 		{	
-			addBackgroundColor(ray, recursionCount, scene, index);
+			thisColot.add(addBackgroundColor(ray, recursionCount, scene, index));
 			
 			//Color diffuzedAndSpecular = new Color(0,0,0);
 			for (Light light : scene.lights)
@@ -108,7 +109,7 @@ public class Pixel {
 
 				dir.normalize();
 				light.lightRay = new Ray(start, dir);
-				addDiffuseColor(ray, scene, index, light);
+				thisColot.add(addDiffuseColor(ray, scene, index, light));
 
 //				dir = start.substract(ray.getIntersectionPoint()
  				dir = ray.getIntersectionPoint().substract(start);
@@ -116,15 +117,15 @@ public class Pixel {
 				dir.normalize();
 				light.lightRay = new Ray(start, dir);
 
-				addSpecularColor(ray, light, scene);
+				thisColot.add(addSpecularColor(ray, light, scene));
 
 
 			}
-			//addReflectiveColor(ray, recursionCount+1, scene, index);
+			thisColot.add(addReflectiveColor(ray, recursionCount, scene, index));
 
 			System.out.format("%f\n", cellColor.r);
 
-			return cellColor;
+			return thisColot;
 		}
 		//a Ray that doesn't hit any surface 
 		else
@@ -132,10 +133,10 @@ public class Pixel {
 	}
 	
 	
-	private void addBackgroundColor(Ray ray, int recursionCount, Scene scene, int index)
+	private Color addBackgroundColor(Ray ray, int recursionCount, Scene scene, int index)
 	{
 		if(ray.closest_intersect.getMaterial(scene).transparency <= 0)
-			return;
+			return new Color(0,0,0);
 		
 		//if the material is transparent- the recursion should continue to the background
 		Vector rayIntersection = ray.startPosition.add(ray.direction.multiply_scalar(ray.min_distance_intersect));	
@@ -144,16 +145,16 @@ public class Pixel {
 		Color backColor = calculateInPixelColor(tansparancyRay, recursionCount+1, scene, index);
 
 		//cellColor += color of back surface * the front surface transparency
-		cellColor = backColor.multiply_scalar(ray.closest_intersect.getMaterial(scene).transparency);
+		return backColor.multiply_scalar(ray.closest_intersect.getMaterial(scene).transparency);
 
 		//System.out.format("Finished add background color, recursionCount is %d\n", recursionCount);
 
 	}
 	
-	private void addDiffuseColor(Ray ray, Scene scene, int index, Light light) 
+	private Color addDiffuseColor(Ray ray, Scene scene, int index, Light light)
 	{
 		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
-			return;
+			return new Color(0,0,0);
 		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
 
 		float dotproduct = light.lightRay.direction.dot_product(normal);
@@ -161,13 +162,13 @@ public class Pixel {
 		Vector normalized = normal.multiply_scalar(dotproduct);
 		float a = normal.dot_product(normalized);
 		if(a>0&&ray.closest_intersect.getMaterial(scene).transparency < 0.2)
-			return;
+			return new Color(0,0,0);
 
 
 
 		//final color = ... + (diffuse + specular) * (1- transp)
 		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
-			return;
+			return new Color(0,0,0);
 
 			//if(Vector.dotProduct(ray.getNormal(), light.direction.getProjection(ray.getNormal())) >0 && ray.surface.getTransparency() < 0.2)
 		//	return this.black;
@@ -189,12 +190,12 @@ public class Pixel {
 		Color diff = lightIntensity.multiply_scalar(softShadowPrecent);  //CHANGE
 		diff = diff.multiply_scalar(normalLightCos);
 
-		cellColor.add(diff.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
+		return diff.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency);
 
 	//	System.out.println("Finished add diffuse color\n");
 	}
 
-	private void addSpecularColor(Ray ray, Light light, Scene scene) 
+	private Color addSpecularColor(Ray ray, Light light, Scene scene)
 	{
 
 		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
@@ -225,19 +226,21 @@ public class Pixel {
 			specular = specular.multiply_color(light.color);
 			specular= specular.multiply_scalar((float)(Math.pow(cos, phong)*light.specular_intensity));
 		}
-		cellColor.add(specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency));
+		return specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency);
 		//System.out.println("Finished add specular color\n");
 		
 		}
 	
-	private void addReflectiveColor(Ray ray, int recursionCount, Scene scene, int index)
+	private Color addReflectiveColor(Ray ray, int recursionCount, Scene scene, int index)
 	{
+
+
 
 		Vector normal = ray.closest_intersect.calcNormal(ray.getIntersectionPoint());
 		float dotproduct = ray.direction.dot_product(normal);
 		dotproduct /= Math.pow(normal.calcLength(),2);
 		Vector normalized = normal.multiply_scalar(dotproduct);
-		
+
 
 		Vector temp = normalized.multiply_scalar(-2);
 		
@@ -252,10 +255,7 @@ public class Pixel {
 		Color reflective = calculateInPixelColor(ray, recursionCount+1, scene, index);
 //		Color reflective = new Color(0,0,0);
 		reflective = reflective.multiply_color(ray.closest_intersect.getMaterial(scene).reflection_color);
-		cellColor.add(reflective);
-		//System.out.format("Finished add reflective color, recursionCount is %d\n", recursionCount);
-		
-
+		return reflective;
 	}
 
 	private float calcSoftShadowPrecent(Light light, Ray ray, Scene scene)
