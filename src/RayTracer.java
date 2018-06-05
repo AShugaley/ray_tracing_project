@@ -53,8 +53,10 @@ public class RayTracer {
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
 
-            sceneFileName = "Room1.txt";
-            outputFileName = "Pool_res.png"; 
+            
+            //TODO- delete !!!!!
+          //  sceneFileName = "Room1.txt";
+          //  outputFileName = "Pool_res.png"; 
 
             tracer.parseScene(sceneFileName);
             
@@ -222,7 +224,12 @@ public class RayTracer {
         // Put your ray tracing code here!
         pixels = new Pixel[imageHeight][imageWidth];
         scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
-        scene.max_recursion_level = 5;
+        
+        
+        //TODO - DELETE!!!!!! 
+        scene.max_recursion_level = 10;
+        
+        
 		//TODO - if there are no surfaces - create background and exit
 		
 		for(int i=0; i<imageHeight; i++)
