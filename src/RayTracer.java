@@ -53,13 +53,9 @@ public class RayTracer {
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
 
-            sceneFileName = "Room1.txt";
+            sceneFileName = "Triangle2.txt";
             outputFileName = "Pool_res.png";
- 
-
             tracer.parseScene(sceneFileName);
-            
-
             tracer.renderScene(outputFileName);
  
         } catch (IOException e) {
@@ -215,17 +211,13 @@ public class RayTracer {
         // Put your ray tracing code here!
         pixels = new Pixel[imageHeight][imageWidth];
         scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
-        scene.max_recursion_level = 10;
+        //scene.max_recursion_level = 4;
 		//TODO - if there are no surfaces - create background and exit
 		
 		for(int i=0; i<imageHeight; i++)
 		{
-		    if(i == 400)
-		        System.out.println("HELLLOOOOOO");
 			for(int j=0; j<imageWidth; j++)
 			{
-                if(j == 100)
-                    System.out.println("HELLLOOOOOO");
 				pixels[i][j] = new Pixel(scene.super_sampling_level, i, j);
 				
 				//For each pixel fill the rays array 
