@@ -162,7 +162,9 @@ public class Pixel {
 		float a = normal.dot_product(normalized);
 		if(a>0&&ray.closest_intersect.getMaterial(scene).transparency < 0.2)
 			return;
-		
+
+
+
 		//final color = ... + (diffuse + specular) * (1- transp)
 		if(ray.closest_intersect.getMaterial(scene).transparency == 1)
 			return;
@@ -263,7 +265,8 @@ public class Pixel {
 		light.lightRay.direction = light.lightRay.startPosition.substract(ray.getIntersectionPoint());
 		light.lightRay.direction.normalize();
 		light.lightRay.min_distance_intersect = light.position.substract(ray.getIntersectionPoint()).calcLength();
-	
+		if(light.shadow_intensity == 0)
+			return 1;
 		//light from the center point only 
 		float pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
 		if(pointLightIntense!=1)
