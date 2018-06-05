@@ -11,12 +11,7 @@ public class Surface {
     {
     	return new Vector();
     }
-    
-    public boolean inDistance(Ray ray, float min, float max)
-    {
-    	return false;
-    }
-    
+
     public Material getMaterial(Scene scene)
     {
     	return scene.materials.get(material-1);

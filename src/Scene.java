@@ -18,7 +18,6 @@ public class Scene {
         lights = new ArrayList<Light>();
         surfaces = new ArrayList<Surface>();
         materials = new ArrayList<Material>();
-
     }
 
 
