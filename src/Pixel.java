@@ -8,6 +8,8 @@ public class Pixel {
 	int index_i, index_j;
 	Random rand;
 	Color cellColor;
+	static final double randomFactor = 0.666;
+
 	
 	public Pixel(int samplingLevel, int i, int j)
 	{
@@ -32,14 +34,17 @@ public class Pixel {
 				add(cam.screen.onePixel_up_direction.multiply_scalar((float)index_i));
 		Vector topLeftPixelCorner = cam.screen.topLeft_screen_corner.add(toPixel);
 		
-		double randomX, randomY;
+		double randomX  = 0;
+		double randomY = 0;
 		
 		for(int m=0; m<samplingLevel; m++)
 		{
 			for(int n=0; n<samplingLevel; n++)
 			{
-				randomX = rand.nextDouble();
-				randomY = rand.nextDouble();
+				while(randomX < randomFactor)
+					randomX = rand.nextDouble();
+				while (randomY < randomFactor)
+					randomY = rand.nextDouble();
 
 				Vector PixelCellPoint = cam.screen.PixelCell_right_direction.multiply_scalar((float)(m+randomX)).
 						add(cam.screen.PixelCell_up_direction.multiply_scalar((float)(n+randomY)));
@@ -54,7 +59,6 @@ public class Pixel {
 			//	System.out.format("index: %d \n", index);
 			}
 		}
-		System.out.println("Finished set rays from pixel\n");
 	}
 	
 	
@@ -123,8 +127,6 @@ public class Pixel {
 			}
 			resColor.add(addReflectiveColor(ray, recursionCount, scene, index));
 
-		//	System.out.format("%f\n", cellColor.r);
-
 			return resColor;
 		}
 		//a Ray that doesn't hit any surface 
@@ -192,7 +194,6 @@ public class Pixel {
 
 		return diff.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency);
 
-	//	System.out.println("Finished add diffuse color\n");
 	}
 
 	private Color addSpecularColor(Ray ray, Light light, Scene scene)
@@ -227,8 +228,6 @@ public class Pixel {
 			specular= specular.multiply_scalar((float)(Math.pow(cos, phong)*light.specular_intensity));
 		}
 		return specular.multiply_scalar(1 - ray.closest_intersect.getMaterial(scene).transparency);
-		//System.out.println("Finished add specular color\n");
-		
 		}
 	
 	private Color addReflectiveColor(Ray ray, int recursionCount, Scene scene, int index)
@@ -240,7 +239,6 @@ public class Pixel {
 		Material m = ray.closest_intersect.getMaterial(scene);
 
 		Vector temp = normalized.multiply_scalar(-2);
-		
 		temp = temp.add(ray.direction);
 		temp.normalize();
 		ray.updateRay(ray.getIntersectionPoint(), temp);
@@ -266,8 +264,7 @@ public class Pixel {
 			return 1;
 		//light from the center point only 
 		float pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
-		if(pointLightIntense!=1)
-			System.out.println("hj");
+
 		pointLightIntense = light.lightRay.checkLightRayIntersection(scene);
 		if(scene.number_shadow_rays == 1)
 			return pointLightIntense;
@@ -303,9 +300,7 @@ public class Pixel {
 				lightIntese += light.lightRay.checkLightRayIntersection(scene);
 			}
 		}
-		if(Math.max(lightIntese, 1-light.shadow_intensity) / (float)Math.pow(scene.number_shadow_rays, 2) != 1.0)
-			System.out.println("MAX");
-//		System.out.println(lightIntese);
+
 		return Math.max(lightIntese, 1-light.shadow_intensity) / (float)Math.pow(scene.number_shadow_rays, 2);
 	}
 
