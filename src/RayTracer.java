@@ -224,11 +224,9 @@ public class RayTracer {
         // Put your ray tracing code here!
         pixels = new Pixel[imageHeight][imageWidth];
         scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
-        
-        
+
         //TODO - DELETE!!!!!! 
         scene.max_recursion_level = 10;
-        
         
 		//TODO - if there are no surfaces - create background and exit
 		
