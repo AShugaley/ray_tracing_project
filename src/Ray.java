@@ -21,6 +21,8 @@ public class Ray
 	{
 		startPosition = start;
 		direction = dir;
+		min_distance_intersect = Float.MAX_VALUE;
+		
 	}
 	
 	public void checkRayIntersection(Scene scene)
@@ -47,6 +49,8 @@ public class Ray
 			{
 				res *= surface.getMaterial(scene).transparency;
 			}
+			if(res < Surface.epsilon ) //almost 0
+				break;
 		}
 		return res;
 	}

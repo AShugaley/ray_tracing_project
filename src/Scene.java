@@ -20,9 +20,5 @@ public class Scene {
         materials = new ArrayList<Material>();
     }
 
-
-
-
-
 }
 

@@ -12,7 +12,6 @@ public class InfinitePlane extends Surface {
     @Override
     public float intersectDist(Ray ray) 
     {
-		// assuming vectors are all normalized
 		Vector intersectionPoint = normal.multiply_scalar(offset);
 		normal.normalize();
 	    float denom = normal.dot_product(ray.direction);

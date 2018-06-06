@@ -5,13 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.lang.Math;
-
- 
 import javax.imageio.ImageIO;
-import java.net.URL;
 /**
  *  Main class for ray tracing exercise.
  */
@@ -21,16 +15,14 @@ public class RayTracer {
     public int imageHeight;
     Scene scene;
 	float[][] image;
-	//Ray[] rays;
 	Pixel[][] pixels;
 	
-	
+
 	public RayTracer()
 	{
 		image = new float[imageWidth][imageHeight];
 	}
  
-
     public static void main(String[] args) {
     	
         try {
@@ -53,7 +45,6 @@ public class RayTracer {
                 tracer.imageHeight = Integer.parseInt(args[3]);
             }
 
-
             tracer.parseScene(sceneFileName);
             tracer.renderScene(outputFileName);
  
@@ -72,19 +63,13 @@ public class RayTracer {
      */
     public void parseScene(String sceneFileName) throws IOException, RayTracerException
     {
-    	FileReader fr = new FileReader(sceneFileName);
         scene = new Scene();
-        //URL url = scene.getClass().getResource(sceneFileName);
-        //File f = new File(url.getPath()); //change this if you pass file from cmd - delete this row and the one above, change 'f' to 'file' in the row below
-
-       // FileReader fr = new FileReader(file);
- 
+        
+        FileReader fr = new FileReader(sceneFileName);
         BufferedReader r = new BufferedReader(fr);
         String line = null;
         int lineNum = 0;
         System.out.println("Started parsing scene file " + sceneFileName);
- 
- 
  
         while ((line = r.readLine()) != null)
         {
@@ -174,11 +159,12 @@ public class RayTracer {
                     System.out.println(String.format("Parsed light (line %d)", lineNum));
                 }
                 else if (code.equals("trg")) {
-                    Triangle t = new Triangle();
-
-                    t.v1 = new Vector(params[1],params[2],params[3]);
-                    t.v2 = new Vector(params[4],params[5],params[6]);
-                    t.v3 = new Vector(params[7],params[8],params[9]);
+                    Vector v1 = new Vector(params[1],params[2],params[3]);
+                    Vector v2 = new Vector(params[4],params[5],params[6]);
+                    Vector v3 = new Vector(params[7],params[8],params[9]);
+                    
+                    Triangle t = new Triangle(v1, v2, v3);
+                    
                     t.material = Integer.parseInt(params[10]);
 
                     scene.surfaces.add(t);
@@ -193,12 +179,11 @@ public class RayTracer {
  
                 // It is recommended that you check here that the scene is valid,
                 // for example camera settings and all necessary materials were defined.
- 
+        r.close();
         System.out.println("Finished parsing scene file " + sceneFileName);
  
     }
  
-    
     
     /**
      * Renders the loaded scene and saves it to the specified file location.
@@ -214,8 +199,6 @@ public class RayTracer {
         // Put your ray tracing code here!
         pixels = new Pixel[imageHeight][imageWidth];
         scene.camera.screen.updateScreenParams(imageHeight, imageWidth, scene.camera, scene.super_sampling_level);
-
-		//TODO - if there are no surfaces - create background and exit
 		
 		for(int i=0; i<imageHeight; i++)
 		{
@@ -226,18 +209,20 @@ public class RayTracer {
 				//For each pixel fill the rays array 
 				pixels[i][j].setRaysFromPixel(scene.camera, scene.super_sampling_level);
 				
-				//For each ray - check which surface intersects with it on the closest position 
 				for(int k=0; k<pixels[i][j].rays.length; k++)
 				{
+					//For each ray - check which surface intersects with it on the closest position 
 					pixels[i][j].rays[k].checkRayIntersection(scene);
 					
-					//pixels[i][j].rays[k].updateRayLength(dist);
+					//For each ray - check which color it gives to the current pixel
 					pixels[i][j].updateInPixelColor(pixels[i][j].rays[k],1, scene, k);
 				}
 				
-				//The color from all the rays is already update
+				//The color from all the rays of the current pixel is already update
 				pixels[i][j].calculatePixelColor(rgbData, imageWidth); 	
 			}
+			if(i%10 == 0)
+				 System.out.format("Finished rendering line number: %d out of %d lines\n", i, imageHeight);
 		}
                
         long endTime = System.currentTimeMillis();

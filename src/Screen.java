@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class Screen {
 	
 	float screen_distance;
@@ -43,15 +41,8 @@ public class Screen {
 			
 		onePixel_up_direction = cam.up_vector.multiply_scalar((-1)*screen_height/imageHeight);
 		onePixel_right_direction = right.multiply_scalar(screen_width/imageWidth);
-		
-	//	this.backToStart = this.pixelWidthDirection.scalarProduct(-x);
-		
+				
 		PixelCell_up_direction = onePixel_up_direction.multiply_scalar(1/samplingLevel); 
 		PixelCell_right_direction = onePixel_right_direction.multiply_scalar(1/samplingLevel);
-		
-		//TODO - Avoiding borders - check this 
-	//	this.mostLeftUp = this.mostLeftUp.add(this.inPixelWidthDirection.scalarProduct(0.5f));				
-	//	this.mostLeftUp = this.mostLeftUp.add(this.inPixelHeightDirection.scalarProduct(0.5f));
-
     }
 }
