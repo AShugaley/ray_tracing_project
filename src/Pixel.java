@@ -113,7 +113,7 @@ public class Pixel {
 
 
 			}
-			resColor.add(addReflectiveColor(ray, recursionCount, scene, index));
+			resColor.add(addReflectiveColor(ray, recursionCount+1, scene, index));
 
 			return resColor;
 		}
